@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:rickandmorty/data/remote/episodes_api.dart';
-import 'package:rickandmorty/data/remote/location_api.dart';
 import 'package:rickandmorty/domain/entities/character.dart';
-import 'package:rickandmorty/domain/entities/location.dart';
-import 'package:rickandmorty/domain/repostories/character_repository.dart';
-import 'package:rickandmorty/presentation/widgets/episodesview.dart';
-import 'package:rickandmorty/presentation/widgets/locationview.dart';
+import 'package:rickandmorty/presentation/location/locationview.dart';
 
 class ListViewPage extends StatefulWidget {
 
@@ -87,7 +82,12 @@ class _ListViewPageState extends State<ListViewPage> {
                             TextButton(
                               child: const Text('Locaciones'),
                               onPressed: () {
-                                showDialogFunc(context, widget.model);
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                      LocationView(model: widget.model)
+                                  ),
+                                );
                               },
                             ),
                             const SizedBox(width: 8),
@@ -103,65 +103,4 @@ class _ListViewPageState extends State<ListViewPage> {
         )
       );
     }
-}
-
-showDialogFunc(BuildContext context, Character model) {
-  
-  //CharacterRepository repository = CharacterRepository();
-
-  LocationApi repository = LocationApi(url: model.location.url);
-
-  return showDialog(
-    context: context,
-    builder: (context){
-      return Center(
-        child: Material(
-          type: MaterialType.transparency,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.white,                
-            ),
-            padding: EdgeInsets.all(15),
-            width: MediaQuery.of(context).size.width * 0.7,
-            height: 320,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(5),
-                  child: Image.network(
-                    model.image,
-                    width: 200,
-                    height: 200,
-                  ),
-                ),
-                SizedBox(height: 10,),
-                Container(
-                  child: FutureBuilder(
-                    future: repository.getLocation(),
-                    builder: (BuildContext context, AsyncSnapshot<List<LocationModel>> snapshot){
-                      if (snapshot.hasData) {
-                      
-                      final items = snapshot.data;
-                      
-                      return ListView.builder(
-                          itemCount: items.length,
-                          itemBuilder: (countext, i) => LocationView(model: items[i]),
-                      );
-                      } else {
-                        return Center(child: CircularProgressIndicator(
-                          backgroundColor: Colors.white,
-                        ),);
-                      }
-                    }
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-  );
 }
